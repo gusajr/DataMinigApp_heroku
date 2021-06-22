@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 from streamlit.proto.DataFrame_pb2 import DataFrame   # Para la generación de gráficas a partir de los datos
 import seaborn as sns             # Para la visualización de datos basado en matplotlib
 
-import time
 import io 
 
 
