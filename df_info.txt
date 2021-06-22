@@ -1,0 +1,28 @@
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 13580 entries, 0 to 13579
+Data columns (total 21 columns):
+ #   Column         Non-Null Count  Dtype  
+---  ------         --------------  -----  
+ 0   Suburb         13580 non-null  object 
+ 1   Address        13580 non-null  object 
+ 2   Rooms          13580 non-null  int64  
+ 3   Type           13580 non-null  object 
+ 4   Price          13580 non-null  float64
+ 5   Method         13580 non-null  object 
+ 6   SellerG        13580 non-null  object 
+ 7   Date           13580 non-null  object 
+ 8   Distance       13580 non-null  float64
+ 9   Postcode       13580 non-null  float64
+ 10  Bedroom2       13580 non-null  float64
+ 11  Bathroom       13580 non-null  float64
+ 12  Car            13518 non-null  float64
+ 13  Landsize       13580 non-null  float64
+ 14  BuildingArea   7130 non-null   float64
+ 15  YearBuilt      8205 non-null   float64
+ 16  CouncilArea    12211 non-null  object 
+ 17  Lattitude      13580 non-null  float64
+ 18  Longtitude     13580 non-null  float64
+ 19  Regionname     13580 non-null  object 
+ 20  Propertycount  13580 non-null  float64
+dtypes: float64(12), int64(1), object(8)
+memory usage: 2.2+ MB
