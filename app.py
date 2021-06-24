@@ -34,7 +34,7 @@ def pagina_inicio():
     st.title('Bienvenid@ a mi Pequeña Herramienta de Inteligencia Artificial (PHIA)')
     st.image(Image.open("ia.png"))
     st.subheader("Esta página fue creada con ❤️ por Gustavo Jiménez, un alumno de la Facultad de Ingeniería de la Universidad Nacional Autónoma de México.")
-    st.write("_Para comenzar el análisis de datos puedes dar clic en la flecha de la esquina superior izquierda para poder escoger alguna de las opciones._")
+    st.write("_Para comenzar el análisis de datos puedes dar clic en la **flecha de la esquina superior izquierda** y escoger alguna de las opciones._")
 
 def pagina_EDA():
     #%matplotlib inline                
@@ -60,7 +60,7 @@ def pagina_EDA():
     datosEDA_subido = st.file_uploader("Escoge el archivo que quieres analizar: ")
 
     if(datosEDA_subido is not None):
-        with st.spinner('Procesando el archivo...'):
+        with st.spinner('Procesando datos...'):
             datosEDA = pd.DataFrame(pd.read_csv(datosEDA_subido))
             st.write("**Datos leídos**")
             st.write(datosEDA)
@@ -70,64 +70,79 @@ def pagina_EDA():
             #    my_bar.progress(percent_complete + 1)
         st.success('¡Hecho!')
 
-        st.header("**Descripción de la estructura de los datos**")
-        st.write("**1. Dimensiones de la data**")
-        datosEDA.shape
-        st.write("**2. Tipos de dato de las variables**")
-        datosEDA.dtypes
+        columnasEDA = st.multiselect(
+            "Escoja las columnas de su elección: ", list(datosEDA.columns), list(datosEDA.columns)
+        )
+        if not columnasEDA:
+            st.error("Por favor escoja al menos una columna a analizar")
+        else:
+            datosEDA = datosEDA[columnasEDA]
+            VariableValoresAtipicos = st.multiselect(
+                    "Escoja las columnas de su elección para visualizar valores atípicos: ", list(datosEDA.columns), ["Price"]
+                )
+            if not VariableValoresAtipicos:
+                st.error("Por favor escoja al menos una columna a analizar para valores atípicos")
+            else:
+                if st.button("Iniciar ejecución"):
+                    st.header("**Descripción de la estructura de los datos**")
+                    st.write("**1. Dimensiones de la data**")
+                    datosEDA.shape
+                    st.write("**2. Tipos de dato de las variables**")
+                    datosEDA.dtypes
 
-        st.header("**Identificación de datos faltantes**")
-        buffer = io.StringIO() 
-        datosEDA.info(buf=buffer)
-        info = buffer.getvalue()
-        st.text(info)
-        #with open("df_info.txt", "w", encoding="utf-8") as f:
-        #    f.write(info) 
+                    st.header("**Identificación de datos faltantes**")
+                    buffer = io.StringIO() 
+                    datosEDA.info(buf=buffer)
+                    info = buffer.getvalue()
+                    st.text(info)
+                    #with open("df_info.txt", "w", encoding="utf-8") as f:
+                    #    f.write(info) 
 
-        st.header("**Detección de valores atípicos**")
-        st.write("**1. Distribución de variables numéricas**")
-        datosEDA.hist(figsize=(14,14), xrot=45)
-        st.set_option('deprecation.showPyplotGlobalUse', False)
-        st.pyplot()
+                    st.header("**Detección de valores atípicos**")
+                    st.write("**1. Distribución de variables numéricas**")
+                    datosEDA.hist(figsize=(14,14), xrot=45)
+                    st.set_option('deprecation.showPyplotGlobalUse', False)
+                    st.pyplot()
 
-        st.write("**2. Resumen estadístico de variables numéricas**")
-        st.write(datosEDA.describe())
+                    st.write("**2. Resumen estadístico de variables numéricas**")
+                    st.write(datosEDA.describe())
 
-        st.write("**3. Diagramas para detectar posibles valores atípicos**")
-        VariablesValoresAtipicos = ['Price', 'Landsize', 'BuildingArea', 'YearBuilt']
-        #fig, axes = plt.subplots(1,1, figsize=(20,20))
-        #fig.suptitle("valores atípicos")
-        #sns.set(rc={'figure.figsize':(10,8)})
-        with st.spinner('Procesando diagrama de caja...'):
-            for col in VariablesValoresAtipicos:
-                sns.boxplot(col, data=datosEDA)
-                plt.show()
-                st.pyplot()
-        st.success('¡Hecho!')
-        
-        st.write("**4. Distribución de variables categóricas**")
-        st.write(datosEDA.describe(include='object'))
-        
-        with st.spinner('Procesando histograma...'):
-            for col in datosEDA.select_dtypes(include='object'):
-                if datosEDA[col].nunique()<10:
-                    sns.countplot(y=col, data=datosEDA)
+                    st.write("**3. Diagramas para detectar posibles valores atípicos**")
+                    
+                    #VariableValoresAtipicos = columnasEDA_atipicos
+                    #fig, axes = plt.subplots(1,1, figsize=(20,20))
+                    #fig.suptitle("valores atípicos")
+                    #sns.set(rc={'figure.figsize':(10,8)})
+                    with st.spinner('Procesando diagrama de caja...'):
+                        for col in VariableValoresAtipicos:
+                            sns.boxplot(col, data=datosEDA)
+                            plt.show()
+                            st.pyplot()
+                    st.success('¡Hecho!')
+                    
+                    st.write("**4. Distribución de variables categóricas**")
+                    st.write(datosEDA.describe(include='object'))
+                    
+                    with st.spinner('Procesando histograma...'):
+                        for col in datosEDA.select_dtypes(include='object'):
+                            if datosEDA[col].nunique()<10:
+                                sns.countplot(y=col, data=datosEDA)
+                                plt.show()
+                                st.pyplot()
+                    st.success('¡Hecho!')
+
+                    for col in datosEDA.select_dtypes(include='object'):
+                        if datosEDA[col].nunique() < 10:
+                            st.write((datosEDA.groupby(col).agg(['mean'])))
+                        
+                    st.header("**Identificación de relaciones entre pares de variables**")
+                    st.write("**1. Matriz de correlaciones**")
+                    st.write(datosEDA.corr())
+                    st.write("**2. Mapa de calor de la matriz de correlaciones**")
+                    plt.figure(figsize=(14,14))
+                    sns.heatmap(datosEDA.corr(), cmap='RdBu_r', annot=True)
                     plt.show()
                     st.pyplot()
-        st.success('¡Hecho!')
-
-        for col in datosEDA.select_dtypes(include='object'):
-            if datosEDA[col].nunique() < 10:
-                st.write((datosEDA.groupby(col).agg(['mean'])))
-        
-        st.header("**Identificación de relaciones entre pares de variables**")
-        st.write("**1. Matriz de correlaciones**")
-        st.write(datosEDA.corr())
-        st.write("**2. Mapa de calor de la matriz de correlaciones**")
-        plt.figure(figsize=(14,14))
-        sns.heatmap(datosEDA.corr(), cmap='RdBu_r', annot=True)
-        plt.show()
-        st.pyplot()
 
     #plt.show()
     #if(DatosEDA is not None):
@@ -148,7 +163,7 @@ def pagina_analisisComponentesPrincipales():
     datosPCA_subido = st.file_uploader("Escoge el archivo que quieres analizar: ")
 
     if(datosPCA_subido is not None):
-        with st.spinner('Procesando el archivo...'):
+        with st.spinner('Procesando datos...'):
             datosPCA = pd.DataFrame(pd.read_csv(datosPCA_subido))
             st.write("**Datos leídos**")
             st.write(datosPCA)
@@ -157,39 +172,49 @@ def pagina_analisisComponentesPrincipales():
             #    time.sleep(0.01)
             #    my_bar.progress(percent_complete + 1)
         st.success('¡Hecho!')
-        st.header("**Estandarización de los datos**")
-        normalizar = StandardScaler()
-        normalizar.fit(datosPCA)
-        datosPCA_normalizada = normalizar.transform(datosPCA)
-        #st.write(pd.DataFrame(datosPCA_normalizada))
-        st.write(datosPCA_normalizada.shape)
-        st.write(pd.DataFrame(datosPCA_normalizada, columns=datosPCA.columns))
-        
-        st.header("**Matriz de covarianzas y correlaciones, varianza y componentes**")
-        Componentes = PCA(n_components=10)
-        Componentes.fit(datosPCA_normalizada)
-        X_Comp = Componentes.transform(datosPCA_normalizada)
-        st.write(pd.DataFrame(X_Comp)) #Componentes.components_
 
-        st.header("**Elección del número de componentes principales (eigen-vectores)**")
-        Varianza = Componentes.explained_variance_ratio_
-        st.write("Eigenvalues:",Varianza)
-        st.write("Varianza acumulada: ",sum(Varianza[0:5]))
+        columnasPCA = st.multiselect(
+            "Escoja las columnas de su elección: ", list(datosPCA.columns), list(datosPCA.columns)
+        )
+        if not columnasPCA:
+            st.error("Por favor escoja al menos una columna a analizar")
+        else:
+            if st.button("Iniciar ejecución"):
+                
+                datosPCA = datosPCA[columnasPCA]
+                st.header("**Estandarización de los datos**")
+                normalizar = StandardScaler()
+                normalizar.fit(datosPCA)
+                datosPCA_normalizada = normalizar.transform(datosPCA)
+                #st.write(pd.DataFrame(datosPCA_normalizada))
+                st.write(datosPCA_normalizada.shape)
+                st.write(pd.DataFrame(datosPCA_normalizada, columns=datosPCA.columns))
+                
+                st.header("**Matriz de covarianzas y correlaciones, varianza y componentes**")
+                Componentes = PCA(n_components=len(datosPCA.columns))
+                Componentes.fit(datosPCA_normalizada)
+                X_Comp = Componentes.transform(datosPCA_normalizada)
+                st.write(pd.DataFrame(X_Comp)) #Componentes.components_
 
-        plt.plot(np.cumsum(Componentes.explained_variance_ratio_))
-        plt.xlabel("Número de componentes")
-        plt.ylabel("Varianza acumulada")
-        plt.grid()
-        plt.show()
-        st.set_option('deprecation.showPyplotGlobalUse', False)
-        st.pyplot()
+                st.header("**Elección del número de componentes principales (eigen-vectores)**")
+                Varianza = Componentes.explained_variance_ratio_
+                st.write("Eigenvalues:",Varianza)
+                st.write("Varianza acumulada: ",sum(Varianza[0:5]))
 
-        st.header("Análisis de proporción de relevancias (cargas)")
-        st.write(pd.DataFrame(abs(Componentes.components_)))
-        CargasComponentes = pd.DataFrame(Componentes.components_, columns=datosPCA.columns)
-        st.write(CargasComponentes)
-        CargasComponentes = pd.DataFrame(abs(Componentes.components_), columns=datosPCA.columns)
-        st.write(CargasComponentes)
+                plt.plot(np.cumsum(Componentes.explained_variance_ratio_))
+                plt.xlabel("Número de componentes")
+                plt.ylabel("Varianza acumulada")
+                plt.grid()
+                plt.show()
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot()
+
+                st.header("Análisis de proporción de relevancias (cargas)")
+                st.write(pd.DataFrame(abs(Componentes.components_)))
+                CargasComponentes = pd.DataFrame(Componentes.components_, columns=datosPCA.columns)
+                st.write(CargasComponentes)
+                CargasComponentes = pd.DataFrame(abs(Componentes.components_), columns=datosPCA.columns)
+                st.write(CargasComponentes)
 
 def main():
 
