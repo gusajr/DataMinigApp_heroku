@@ -3,25 +3,38 @@ import streamlit as st
 # working with sample data.
 import numpy as np
 import pandas as pd
-
-import pandas as pd     # Para la manipulación y análisis de datos
-import numpy as np      # Para crear vectores y matrices n dimensionales
 import matplotlib.pyplot as plt
 from streamlit.proto.DataFrame_pb2 import DataFrame   # Para la generación de gráficas a partir de los datos
 import seaborn as sns             # Para la visualización de datos basado en matplotlib
 
-import io 
+#import pandas as pd                                   # Para la manipulación y análisis de datos
+#import numpy as np                                    # Para crear vectores y matrices n dimensionales
+#import matplotlib.pyplot as plt                       # Para la generación de gráficas a partir de los datos
+#import seaborn as sns                                 # Para la visualización de datos basado en matplotlib
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
+import io 
+from PIL import Image
 
 #sudo apt-get install python3-tk
 
-PAGES = {
+PAGES = (
+    "Inicio",
     "Análisis exploratorio de datos",#: src.pages.home,
-    "Componentes principales",#: src.pages.resources,
+    "Análisis de componentes principales",
+    #"Acerca"#: src.pages.resources,
     #"Gallery",#: src.pages.gallery.index,
     #"Vision",#: src.pages.vision,
-    "Acerca"#: src.pages.about,
-}
+    #"Acerca"#: src.pages.about,
+)
+
+def pagina_inicio():
+
+    st.title('Bienvenid@ a mi Pequeña Herramienta de Inteligencia Artificial (PHIA)')
+    st.image(Image.open("ia.png"))
+    st.subheader("Esta página fue creada con ❤️ por Gustavo Jiménez, un alumno de la Facultad de Ingeniería de la Universidad Nacional Autónoma de México.")
+    st.write("_Para comenzar el análisis de datos puedes dar clic en la flecha de la esquina superior izquierda para poder escoger alguna de las opciones._")
 
 def pagina_EDA():
     #%matplotlib inline                
@@ -29,17 +42,17 @@ def pagina_EDA():
 
     st.title('Análisis Exploratorio de Datos (EDA)')
 
-    st.write(pd.DataFrame({
-        'first column': [1, 2, 3, 4],
-        'second column': [10, 20, 30, 40]
-    }))
+    #st.write(pd.DataFrame({
+    #    'first column': [1, 2, 3, 4],
+    #    'second column': [10, 20, 30, 40]
+    #}))
 
-    option1 = st.selectbox(
-        'Which number do you like best?',
-        [1,2,3,4,5]
-    )
+    #option1 = st.selectbox(
+    #    'Which number do you like best?',
+    #    [1,2,3,4,5]
+    #)
 
-    st.write('You selected option:', option1)
+    #st.write('You selected option:', option1)
 
     st.header("**Importación de datos**")
     st.write("**1. Lectura de datos**")
@@ -120,13 +133,63 @@ def pagina_EDA():
     #if(DatosEDA is not None):
     #    DatosEDA
 
-def pagina_inicio():
-    """
-    # Página 2
-    Here's our first attempt at using data to create a table:
-    """
-    st.title('Página 2')
-    st.write("Here's our first attempt at using data to create a table:")
+def pagina_analisisComponentesPrincipales():
+    #"""
+    # Componentes principales
+    #En esta página se visualizan las componentes principales de un set de datos.
+    #"""
+
+    st.title('Componentes principales (PCA)')
+    #st.write("En esta página se visualizan las componentes principales de un set de datos.")
+
+    st.header("**Importación de datos**")
+    st.write("**1. Lectura de datos**")
+
+    datosPCA_subido = st.file_uploader("Escoge el archivo que quieres analizar: ")
+
+    if(datosPCA_subido is not None):
+        with st.spinner('Procesando el archivo...'):
+            datosPCA = pd.DataFrame(pd.read_csv(datosPCA_subido))
+            st.write("**Datos leídos**")
+            st.write(datosPCA)
+            #my_bar = st.progress(0)
+            #for percent_complete in range(100):
+            #    time.sleep(0.01)
+            #    my_bar.progress(percent_complete + 1)
+        st.success('¡Hecho!')
+        st.header("**Estandarización de los datos**")
+        normalizar = StandardScaler()
+        normalizar.fit(datosPCA)
+        datosPCA_normalizada = normalizar.transform(datosPCA)
+        #st.write(pd.DataFrame(datosPCA_normalizada))
+        st.write(datosPCA_normalizada.shape)
+        st.write(pd.DataFrame(datosPCA_normalizada, columns=datosPCA.columns))
+        
+        st.header("**Matriz de covarianzas y correlaciones, varianza y componentes**")
+        Componentes = PCA(n_components=10)
+        Componentes.fit(datosPCA_normalizada)
+        X_Comp = Componentes.transform(datosPCA_normalizada)
+        st.write(pd.DataFrame(X_Comp)) #Componentes.components_
+
+        st.header("**Elección del número de componentes principales (eigen-vectores)**")
+        Varianza = Componentes.explained_variance_ratio_
+        st.write("Eigenvalues:",Varianza)
+        st.write("Varianza acumulada: ",sum(Varianza[0:5]))
+
+        plt.plot(np.cumsum(Componentes.explained_variance_ratio_))
+        plt.xlabel("Número de componentes")
+        plt.ylabel("Varianza acumulada")
+        plt.grid()
+        plt.show()
+        st.set_option('deprecation.showPyplotGlobalUse', False)
+        st.pyplot()
+
+        st.header("Análisis de proporción de relevancias (cargas)")
+        st.write(pd.DataFrame(abs(Componentes.components_)))
+        CargasComponentes = pd.DataFrame(Componentes.components_, columns=datosPCA.columns)
+        st.write(CargasComponentes)
+        CargasComponentes = pd.DataFrame(abs(Componentes.components_), columns=datosPCA.columns)
+        st.write(CargasComponentes)
 
 def main():
 
@@ -134,12 +197,12 @@ def main():
         page_title="PHIA",
         page_icon="🤖",
         layout="centered",
-        initial_sidebar_state="expanded",
+        #initial_sidebar_state="expanded",
     )
 
     #"""Main function of the App"""
-    st.sidebar.title("Navegación")
-    selection = st.sidebar.radio("Da clic en la pestaña que te gustaría utilizar: ", list(PAGES))
+    st.sidebar.title("Comencemos...")
+    selection = st.sidebar.radio("Da clic en la función que te gustaría utilizar: ", PAGES)
 
     df = pd.DataFrame({
     'first column': [1, 2, 3, 4],
@@ -155,18 +218,21 @@ def main():
 
     #    chart_data
 
-    option2 = st.sidebar.selectbox(
-        'Which number do you like best?',
-        df['first column']
-        )
+    #option2 = st.sidebar.selectbox(
+    #    'Which number do you like best?',
+    #    df['first column']
+    #    )
 
-    st.sidebar.write('You selected:', option2)
+    #st.sidebar.write('You selected:', option2)
 
     if(selection == "Análisis exploratorio de datos"):
         pagina_EDA()
 
-    else:
+    elif(selection == "Inicio"):
         pagina_inicio()
+
+    elif(selection == "Análisis de componentes principales"):
+        pagina_analisisComponentesPrincipales()
         
 if __name__ == "__main__":
     main()
