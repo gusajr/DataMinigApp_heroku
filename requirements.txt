@@ -6,5 +6,4 @@ seaborn
 sklearn
 scipy
 kneed
-mpl_toolkits
 apyori
