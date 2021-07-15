@@ -4,7 +4,6 @@ pandas
 matplotlib
 seaborn
 sklearn
-SessionState
 scipy
 kneed
 mpl_toolkits
