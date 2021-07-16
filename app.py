@@ -24,7 +24,7 @@ from sklearn.metrics import pairwise_distances_argmin_min
 from kneed import KneeLocator
 from mpl_toolkits.mplot3d import Axes3D
 from apyori import apriori
-
+from app_aux import *
 
 #sudo apt-get install python3-tk
 
@@ -407,7 +407,7 @@ def pagina_apriori():
     st.header("**Importación de datos**")
     st.write("**1. Lectura de datos**")
 
-    if(st.radio("¿Contiene Header?",("Si","No"))=="No"):
+    if(st.radio("¿Contiene Header?",("No","Si"))=="No"):
         datosApriori_header = None
     else:
         datosApriori_header = 0
@@ -440,19 +440,45 @@ def pagina_apriori():
                 for i in range(0, 7460):
                     listaObjetos.append([str(datosApriori.values[i,j]) 
                     for j in range(0, 20)])
-                st.write(listaObjetos)
+                #st.write(listaObjetos)
+                #st.write(json.loads(listaObjetos))
 
                 ListaReglas = apriori(listaObjetos, min_support=float(soporte), min_confidence=float(confianza), min_lift=float(elevacion))
                 ReglasAsociacion = list(ListaReglas)
-                st.write("**Número de reglas de asociación**")
-                st.text(len(ReglasAsociacion))
                 ReglasAsociacionVerdaderas = []
                 for i in range (len(ReglasAsociacion)):
                     if("nan" not in ReglasAsociacion[i].items):
                         ReglasAsociacionVerdaderas.append(ReglasAsociacion[i])
-                st.json(ReglasAsociacionVerdaderas)
+                
+                with st_stdout("success"):
+                    print("**Número de reglas de asociación:",len(ReglasAsociacionVerdaderas),"**")
 
-                st.write("ok")
+                #with st_stdout("code"):
+                #    print("hello")
+                    #print(listaObjetos)
+                    #print(ReglasAsociacionVerdaderas)
+
+                with st_stdout("info"):
+                    #print("Prints as st.info()")
+                    #print(listaObjetos)
+                    for i in range (len(ReglasAsociacionVerdaderas)):
+                        print("**Regla de asociacion",i,"**\n")
+                        statistics = ReglasAsociacionVerdaderas[i].ordered_statistics[0]
+                        print("{0}, Soporte={1:.2f}, Confianza={2:.2f}, Elevación={3:.2f}".format(
+                            ReglasAsociacionVerdaderas[i].items,ReglasAsociacionVerdaderas[i].support,statistics.confidence,statistics.lift
+                        )
+                        )
+                        #print(ReglasAsociacionVerdaderas[i])
+                        print("\n")
+
+                #with st_stdout("markdown"):
+                #    print("Prints as st.markdown()")
+
+                #with st_stdout("success"), st_stderr("error"):
+                #    print("You can print regular success messages")
+                #    print("And you can redirect errors as well at the same time", file=sys.stderr)
+
+                #st.write("ok")
 
 def pagina_pruebas():
     st.title('Prueba')

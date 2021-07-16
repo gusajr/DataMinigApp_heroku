@@ -7,3 +7,4 @@ sklearn
 scipy
 kneed
 apyori
+threading
