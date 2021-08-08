@@ -1,5 +1,3 @@
-from numpy.random import random_integers
-from scipy.sparse.construct import rand
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -7,29 +5,33 @@ import matplotlib.pyplot as plt
 from streamlit.proto.DataFrame_pb2 import DataFrame
 import seaborn as sns
 
+from numpy.random import random_integers
+from scipy.sparse.construct import rand
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 import io 
-from PIL import Image
 
 import SessionState
-from scipy.spatial.distance import cdist
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 from kneed import KneeLocator
 from mpl_toolkits.mplot3d import Axes3D
-from apyori import apriori
 from app_aux import *
 import time
-from random import randint
-#from session_state import get_session_state
 from sklearn import linear_model 
 from sklearn import model_selection
 from sklearn.metrics import classification_report 
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import accuracy_score
 import math
+
+#from sklearn.metrics import confusion_matrix
+#from sklearn.metrics import accuracy_score
+#from PIL import Image
+#from random import randint
+#from session_state import get_session_state
+#from apyori import apriori
+#from scipy.spatial.distance import cdist
 
 #sudo apt-get install python3-tk
 global datos, datos_subido
