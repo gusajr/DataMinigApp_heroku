@@ -82,11 +82,14 @@ def pagina_carga_datos():
         datos_header = 0
 
     datos_sep = st.text_input("Separación de los datos: ", value=",")
-    datos_subido = st.file_uploader("Escoge el archivo que quieres analizar: ", type = ['csv', 'xlsx', 'xls'],key=session_state.widgetKey)
+    datos_subido = st.file_uploader("Escoge el archivo que quieres analizar: ", type = ['txt', 'csv', 'xls'],key=session_state.widgetKey)
 
     if(datos_subido is not None):
         with st.spinner('Procesando datos...'):
-            datos_csv = pd.read_csv(datos_subido, header=datos_header, sep=datos_sep)
+            if(datos_subido.name.split(".")[1] == "txt" or datos_subido.name.split(".")[1] == "csv"):
+                datos_csv = pd.read_csv(datos_subido, header=datos_header, sep=datos_sep)
+            if(datos_subido.name.split(".")[1] == "xls"):
+                datos_csv = pd.read_excel(datos_subido)
             session_state.datos_iniciales = pd.DataFrame(datos_csv)
             #st.write(session_state.datos_iniciales)
             session_state.datos_iniciales_0 = session_state.datos_iniciales
