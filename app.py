@@ -82,7 +82,7 @@ def pagina_carga_datos():
         datos_header = 0
 
     datos_sep = st.text_input("Separación de los datos: ", value=",")
-    datos_subido = st.file_uploader("Escoge el archivo que quieres analizar: ", type = ['csv', 'xlsx', 'xls'], key=session_state.widgetKey)
+    datos_subido = st.file_uploader("Escoge el archivo que quieres analizar: ", type = ['csv', 'xlsx', 'xls'])
 
     if(datos_subido is not None):
         with st.spinner('Procesando datos...'):
