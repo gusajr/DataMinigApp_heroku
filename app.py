@@ -84,7 +84,7 @@ def pagina_carga_datos():
         datos_header = 0
 
     datos_sep = st.text_input("Separación de los datos: ", value=",")
-    datos_subido = st.file_uploader("Escoge el archivo que quieres analizar: ", type = ['csv', 'xlsx', 'xls'],key=session_state.widgetKey)
+    datos_subido = st.file_uploader("Escoge el archivo que quieres analizar: ", type = ['csv', 'xlsx', 'xls'],key=bytes(session_state.widgetKey))
 
     if(datos_subido is not None):
         with st.spinner('Procesando datos...'):
@@ -608,7 +608,7 @@ def main():
         page_title="PHMD",
         page_icon="🤖",
         layout="centered",
-        initial_sidebar_state="auto",
+        initial_sidebar_state="auto"
     )
 
     #"""Main function of the App"""
