@@ -1,18 +1,24 @@
+# '''
+#     Aplicación de Minería de datos
+#     Gustavo Alfredo Jiménez Ruiz
+#     09 de agosto del 2021
+# '''
+
+# '''
+#     Importación de bibliotecas y funciones
+# '''
+
 import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from streamlit.proto.DataFrame_pb2 import DataFrame
 import seaborn as sns
-
 from numpy.random import random_integers
 from scipy.sparse.construct import rand
-
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-
 import io 
-
 import SessionState
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
@@ -25,18 +31,12 @@ from sklearn import model_selection
 from sklearn.metrics import classification_report 
 import math
 
-#from sklearn.metrics import confusion_matrix
-#from sklearn.metrics import accuracy_score
-#from PIL import Image
-#from random import randint
-#from session_state import get_session_state
-#from apyori import apriori
-#from scipy.spatial.distance import cdist
-
-#sudo apt-get install python3-tk
-#datos = None
-#datos_subido = None
-#st.caching.clear_cache()
+st.set_page_config(
+        page_title="PHMD",
+        page_icon="🤖",
+        layout="centered",
+        initial_sidebar_state="auto"
+    )
 
 PAGES = (
     "🤖 Inicio",
@@ -44,14 +44,52 @@ PAGES = (
     "📖 Análisis exploratorio de datos",
     "📊 Análisis de componentes principales",
     "👪 Clustering particional",
-    "🔎 Clasificación",
+    "🔎 Clasificación RL",
     "🔎 Prueba de modelo RL"
 )
 
+
+# '''
+#     Variables de la sesión
+# '''
 global session_state
 session_state = SessionState.get(datosEDA = 0, datos = None, valor_reemplazo = 0, widgetKey = "new.1")
 session_state_1 = SessionState.get(datosPCA = 0, clustering_sns_pairplot = None)
 session_state_1.clustering_sns_pairplot = None
+
+# '''
+#     Función principal de la aplicación
+# '''
+def main():
+
+    st.sidebar.title("🟡 Barra de navegación")
+    selection = st.sidebar.radio("🔷 Da clic en la función que te gustaría utilizar: ", PAGES)
+
+    if(selection == "📖 Análisis exploratorio de datos"):
+        pagina_analisisExploratorioDeDatos()
+
+    elif(selection == "🤖 Inicio"):
+        pagina_inicio()
+
+    elif(selection == "💾 Carga de datos"):
+        pagina_carga_datos()
+
+    elif(selection == "📊 Análisis de componentes principales"):
+        pagina_analisisComponentesPrincipales()
+
+    elif(selection == "👪 Clustering particional"):
+        pagina_clustering()
+
+    elif(selection == "🔎 Clasificación RL"):
+        pagina_clasificacion()
+
+    elif(selection == "🔎 Prueba de modelo RL"):
+        pagina_prueba_modelo()
+
+
+# '''
+#     Página que muestra el inicio de la aplicación
+# '''
 def pagina_inicio():
 
     st.title('Bienvenid@ a mi Pequeña Herramienta de Minería de Datos (PHMD)')
@@ -62,7 +100,7 @@ def pagina_inicio():
         my_bar.progress(percent_complete + 1)
 
     chart_data = pd.DataFrame(
-        np.random.randn(50, 3),
+        np.random.randn(10, 3),
         columns=['a', 'b', 'c'])
     st.line_chart(chart_data)
     
@@ -70,6 +108,10 @@ def pagina_inicio():
     st.subheader("Esta herramienta fue creada con ❤️ por Gustavo Jiménez, alumno de la Facultad de Ingeniería de la Universidad Nacional Autónoma de México.")
     st.write("_Para comenzar el análisis de datos puedes dar clic en alguna de las opciones de la barra de navegación._")
 
+
+# '''
+#     Página que muestra la carga de datos
+# '''
 def pagina_carga_datos():
 
     st.title('Carga y modificación de datos')
@@ -91,7 +133,6 @@ def pagina_carga_datos():
             if(datos_subido.name.split(".")[1] == "xls"):
                 datos_csv = pd.read_excel(datos_subido)
             session_state.datos_iniciales = pd.DataFrame(datos_csv)
-            #st.write(session_state.datos_iniciales)
             session_state.datos_iniciales_0 = session_state.datos_iniciales
         st.success('¡Hecho!')
         session_state.widgetKey=session_state.widgetKey.split(".")[0]+"."+str(int(session_state.widgetKey.split(".")[1])+1)
@@ -150,7 +191,9 @@ def pagina_carga_datos():
         st.write("Sin datos.")
         #st.exception(e)
 
-
+# '''
+#     Página que muestra los pasos para el Análisis Exploratorio de Datos
+# '''
 def pagina_analisisExploratorioDeDatos():
 
     st.title('Análisis Exploratorio de Datos (EDA)')
@@ -243,13 +286,10 @@ def pagina_analisisExploratorioDeDatos():
         st.error("Datos no cargados o incompatibles, por favor dirígete a la pestaña de carga de datos")
         #st.exception(e)
 
+# '''
+#     Página que muestra los pasos para el Análisis de las Componentes Principales
+# '''
 def pagina_analisisComponentesPrincipales():
- 
-    #"""
-    # Componentes principales
-    #En esta página se visualizan las componentes principales de un set de datos.
-    #"""
-
     st.title('Análisis de Componentes Principales (PCA)')
 
     datosPCA = session_state.datos
@@ -302,14 +342,14 @@ def pagina_analisisComponentesPrincipales():
             st.header("Análisis de proporción de relevancias (cargas)")
             st.write("Se revisan los valores absolutos de los componentes principales seleccionados. Cuanto mayor sea el valor absoluto, más importante es esa variable en el componente principal.")
             st.write(pd.DataFrame(abs(Componentes.components_),columns=datosPCA.columns))
-            #CargasComponentes = pd.DataFrame(Componentes.components_, columns=datosPCA.columns)
-            #st.write(CargasComponentes)
-            #CargasComponentes = pd.DataFrame(abs(Componentes.components_), columns=datosPCA.columns)
-            #st.write(CargasComponentes)
+
     else:
         st.error("Datos no cargados o incompatibles, por favor dirígete a la pestaña de carga de datos")
-        ##st.exception(e)
+        #st.exception(e)
 
+# '''
+#     Página que muestra el algoritmo de Clustering
+# '''
 def pagina_clustering():
     st.title('Clustering particional')
     try:
@@ -324,12 +364,8 @@ def pagina_clustering():
             st.header("Selección de características")
             
             st.write("Comparación de relación entre variables")
-
-        #while True:
-
+            
         session_state.numericos = pd.DataFrame(session_state.datos).select_dtypes(include=np.number).replace(np.NaN,0)
-
-
         columna0 = st.selectbox("Selecciona la columna principal a comparar para los ejes: ", session_state.numericos.columns, key="15")
         clustering_x = st.selectbox("Selecciona la primer variable:", session_state.numericos.columns, key="4")
         clustering_y = st.selectbox("Selecciona la segunda variable:", session_state.numericos.columns, key="5")
@@ -384,7 +420,6 @@ def pagina_clustering():
                 km.fit(datosPCA)
                 SSE.append(km.inertia_)
 
-            #Se grafica SSE en función de k
             plt.figure(figsize=(10,7))
             plt.plot(range(2,12),SSE,marker="o")
             plt.xlabel("Cantidad de clústers *k*")
@@ -418,7 +453,6 @@ def pagina_clustering():
             st.write("Media de los registros en cada clúster")
             CentroidesP = MParticional.cluster_centers_
             st.write(pd.DataFrame(CentroidesP.round(4),columns=datosPCA.columns[0:len(datosPCA.columns)-1]))
-            #from plotnine import *
 
             plt.rcParams["figure.figsize"] = (10,7)
             plt.style.use("ggplot")
@@ -435,20 +469,18 @@ def pagina_clustering():
             ax.scatter(CentroidesP[:,0],CentroidesP[:,1],CentroidesP[:,2],marker="*",c=colores,s=1000)
             plt.show()
             st.pyplot()
-            #st.pyplot(ggplot.draw(fig))
 
             st.write("Registros más cercanos al centroide")
             Cercanos,_ = pairwise_distances_argmin_min(MParticional.cluster_centers_, session_state.numericos)
             Cercanos
 
-        #st.write("1. Dimensiones de la data")
     except Exception as e:
         st.error("Datos no cargados o incompatibles, por favor dirígete a la pestaña de carga de datos.")
         #st.exception(e)
 
-#@st.cache(suppress_st_warning=True)
-#def clustering_cache_sns(sns_data, columna, columna_tmp):
-
+# '''
+#     Página que muestra el algoritmo de Clasificación
+# '''
 def pagina_clasificacion():
 
     datosClasificacion = session_state.datos
@@ -477,7 +509,6 @@ def pagina_clasificacion():
             
             st.write("Comparación de relación entre variables")
 
-            #while True:
             st.set_option('deprecation.showPyplotGlobalUse', False)
             clustering_x = st.selectbox("Selecciona la primer variable:", session_state.datos.columns, key="12")
             clustering_y = st.selectbox("Selecciona la segunda variable:", session_state.datos.columns, key="13")
@@ -526,9 +557,7 @@ def pagina_clasificacion():
                 Predicciones = Clasificacion.predict(X_train)
                 st.write(pd.DataFrame(Predicciones))
 
-                # st.write("Exactitud")
                 exactitud = Clasificacion.score(X_train,Y_train)
-                # st.info(exactitud)
 
                 st.header("Validación del modelo")
 
@@ -551,11 +580,25 @@ def pagina_clasificacion():
                 session_state.datosRL = X
                 session_state.exactitudRL = exactitud
 
+                VP=confusion_matrix.loc[0,0]
+                FN=confusion_matrix.loc[0,1]
+                FP=confusion_matrix.loc[1,0]
+                VN=confusion_matrix.loc[1,1]
+
+                precision= VP/(VP+FP)
+                tasaError=(FP+FN)/(VP+VN+FP+FN)
+                sensibilidad=VP/(VP+FN)
+                especificidad= VN/(VN+FP)
+
                 with st_stdout("info"):
                     for i in range(len(session_state.datosRL.columns)):
                         print("{0:s} tiene una carga de: **{1:.3f}**\n".format(session_state.datosRL.columns[i],float(session_state.modeloRL[0,i])))
                 with st_stdout("info"):
-                    print("La exactitud del modelo es: **{0:.2f}%**".format(float(session_state.exactitudRL)*100))
+                    print("La exactitud del modelo es: **{0:.2f}%**\n".format(float(session_state.exactitudRL)*100))
+                    print("La precisión del modelo es: **{0:.2f}%**\n".format(precision*100))
+                    print("La tasa de error del modelo es: **{0:.2f}%**\n".format(tasaError*100))
+                    print("La sensibilidad del modelo es: **{0:.2f}%**\n".format(sensibilidad*100))
+                    print("La especificidad del modelo es: **{0:.2f}%**\n".format(especificidad*100))
 
                 st.success("¡Se ha copiado el modelo predictivo! Dirígete a la pestaña de prueba de modelo RL para insertar datos")
         else:
@@ -564,6 +607,9 @@ def pagina_clasificacion():
         st.error("Datos no cargados o incompatibles, por favor dirígete a la pestaña de carga de datos.")
         #st.exception(e)
 
+# '''
+#     Página que muestra el modelo de Clasificación RL
+# '''
 def pagina_prueba_modelo():
     st.title('Prueba del modelo de Clasificación RL')
     st.header("Modelo actual")
@@ -602,40 +648,6 @@ def pagina_prueba_modelo():
         st.error("Datos no cargados o incompatibles, por favor dirígete a la pestaña de carga de datos. Si ya lo has hecho, dirígete a clasificación para generar el modelo de predicción")
         st.warning("Verifica que los datos insertados sean numéricos")
         #st.exception(e)
-
-def main():
-
-    st.set_page_config(
-        page_title="PHMD",
-        page_icon="🤖",
-        layout="centered",
-        initial_sidebar_state="auto"
-    )
-
-    #"""Main function of the App"""
-    st.sidebar.title("🟡 Barra de navegación")
-    selection = st.sidebar.radio("🔷 Da clic en la función que te gustaría utilizar: ", PAGES)
-
-    if(selection == "📖 Análisis exploratorio de datos"):
-        pagina_analisisExploratorioDeDatos()
-
-    elif(selection == "🤖 Inicio"):
-        pagina_inicio()
-
-    elif(selection == "💾 Carga de datos"):
-        pagina_carga_datos()
-
-    elif(selection == "📊 Análisis de componentes principales"):
-        pagina_analisisComponentesPrincipales()
-
-    elif(selection == "👪 Clustering particional"):
-        pagina_clustering()
-
-    elif(selection == "🔎 Clasificación"):
-        pagina_clasificacion()
-
-    elif(selection == "🔎 Prueba de modelo RL"):
-        pagina_prueba_modelo()
         
 if __name__ == "__main__":
     main()
