@@ -34,20 +34,9 @@ import math
 #from scipy.spatial.distance import cdist
 
 #sudo apt-get install python3-tk
-global datos, datos_subido
-datos = None
-datos_subido = None
-st.caching.clear_cache()
-
-# class PaginaDatos:
-#     datos = 0
-#     datos_sep = 0
-#     datos_subido = 0
-#     datos_header = 0
-#     datos_csv = 0
-
-# global paginaDatos
-# paginaDatos = PaginaDatos()
+#datos = None
+#datos_subido = None
+#st.caching.clear_cache()
 
 PAGES = (
     "🤖 Inicio",
@@ -60,8 +49,6 @@ PAGES = (
 )
 
 global session_state
-global session_state_1
-
 session_state = SessionState.get(datosEDA = 0, datos = None, valor_reemplazo = 0, widgetKey = 0)
 session_state_1 = SessionState.get(datosPCA = 0, clustering_sns_pairplot = None)
 session_state_1.clustering_sns_pairplot = None
@@ -84,10 +71,6 @@ def pagina_inicio():
     st.write("_Para comenzar el análisis de datos puedes dar clic en alguna de las opciones de la barra de navegación._")
 
 def pagina_carga_datos():
-    
-    global datos
-    global datos_subido
-    global session_state
 
     st.title('Carga y modificación de datos')
     st.header("Importación de datos")
