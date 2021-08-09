@@ -162,7 +162,7 @@ def pagina_carga_datos():
                     
     except Exception as e:
         st.write("Sin datos.")
-        st.exception(e)
+        #st.exception(e)
 
 
 def pagina_analisisExploratorioDeDatos():
@@ -376,16 +376,11 @@ def pagina_clustering():
             plt.show()
             st.pyplot()
 
-            st.header("Elección de variables")
-            columnasPCA = st.multiselect(
-                "Escoge las columnas de tu elección: ", list(session_state.numericos.columns), list(session_state.numericos.columns)
-            )
-            if not columnasPCA:
-                st.error("Por favor escoge al menos una columna a analizar")
-            else:
-                datosPCA = session_state.numericos[columnasPCA]
-            
+            st.header("Variables utilizadas para clustering")
+            datosPCA = session_state.numericos
             datosPCA
+
+            st.warning("Recuerda que si necesitas modificar tus datos debes dirigirte a la pestaña de carga de datos")
 
             st.header("Algoritmo K-means")
             SSE=[]
@@ -448,13 +443,13 @@ def pagina_clustering():
             #st.pyplot(ggplot.draw(fig))
 
             st.write("Registros más cercanos al centroide")
-            Cercanos,_ = pairwise_distances_argmin_min(MParticional.cluster_centers_, session_state.numericos)
+            Cercanos,_ = pairwise_distances_argmin_min(MParticional.cluster_centers_, datosPCA[0:len(datosPCA.columns)-2])
             Cercanos
 
         #st.write("1. Dimensiones de la data")
     except Exception as e:
         st.error("Datos no cargados o incompatibles, por favor dirígete a la pestaña de carga de datos.")
-        #st.exception(e)
+        st.exception(e)
 
 #@st.cache(suppress_st_warning=True)
 #def clustering_cache_sns(sns_data, columna, columna_tmp):
