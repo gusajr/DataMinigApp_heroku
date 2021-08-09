@@ -616,7 +616,7 @@ def pagina_prueba_modelo():
 def main():
 
     st.set_page_config(
-        page_title="PHIA",
+        page_title="PHMD",
         page_icon="🤖",
         layout="centered",
         initial_sidebar_state="auto",
