@@ -72,6 +72,8 @@ def pagina_inicio():
 
 def pagina_carga_datos():
 
+    session_state.widgetKey=0
+
     st.title('Carga y modificación de datos')
     st.header("Importación de datos")
     st.write("1. Lectura de datos")
@@ -86,7 +88,7 @@ def pagina_carga_datos():
 
     if(datos_subido is not None):
         with st.spinner('Procesando datos...'):
-            datos_csv = pd.read_csv(datos_subido, header=datos_header, sep=datos_sep)
+            datos_csv = pd.read_csv(datos_subido, header=datos_header, sep=datos_sep, key=session_state.widgetKey)
             session_state.datos_iniciales = pd.DataFrame(datos_csv)
             #st.write(session_state.datos_iniciales)
             session_state.datos_iniciales_0 = session_state.datos_iniciales
