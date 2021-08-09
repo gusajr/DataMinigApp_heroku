@@ -217,6 +217,8 @@ def pagina_analisisExploratorioDeDatos():
                 st.write("3. Diagramas para detectar posibles valores atípicos")
                 with st.spinner('Procesando diagrama de caja...'):
                     for col in VariableValoresAtipicos:
+                        with st_stdout("info"):
+                            print("Diagrama de cajas y bigote para "+str(col))
                         sns.boxplot(col, data=datosEDA)
                         plt.show()
                         st.pyplot()
@@ -312,11 +314,12 @@ def pagina_analisisComponentesPrincipales():
             st.pyplot()
 
             st.header("Análisis de proporción de relevancias (cargas)")
-            st.write(pd.DataFrame(abs(Componentes.components_)))
-            CargasComponentes = pd.DataFrame(Componentes.components_, columns=datosPCA.columns)
-            st.write(CargasComponentes)
-            CargasComponentes = pd.DataFrame(abs(Componentes.components_), columns=datosPCA.columns)
-            st.write(CargasComponentes)
+            st.write("Se revisan los valores absolutos de los componentes principales seleccionados. Cuanto mayor sea el valor absoluto, más importante es esa variable en el componente principal.")
+            st.write(pd.DataFrame(abs(Componentes.components_),columns=datosPCA.columns))
+            #CargasComponentes = pd.DataFrame(Componentes.components_, columns=datosPCA.columns)
+            #st.write(CargasComponentes)
+            #CargasComponentes = pd.DataFrame(abs(Componentes.components_), columns=datosPCA.columns)
+            #st.write(CargasComponentes)
     else:
         st.error("Datos no cargados o incompatibles, por favor dirígete a la pestaña de carga de datos")
         ##st.exception(e)
@@ -376,10 +379,16 @@ def pagina_clustering():
             plt.show()
             st.pyplot()
 
-            st.header("Variables utilizadas para clustering")
-            datosPCA = session_state.numericos
-            datosPCA
+            st.header("Variables utilizadas en el análisis")
+            columnasPCA = st.multiselect(
+                "Se enlistan las columnas que se utilizan:", list(session_state.numericos.columns), list(session_state.numericos.columns)
+            )
+            if not columnasPCA:
+                st.error("Por favor escoge al menos una columna a analizar")
+            else:
+                datosPCA = session_state.numericos[columnasPCA]
 
+            datosPCA
             st.warning("Recuerda que si necesitas modificar tus datos debes dirigirte a la pestaña de carga de datos")
 
             st.header("Algoritmo K-means")
@@ -443,13 +452,13 @@ def pagina_clustering():
             #st.pyplot(ggplot.draw(fig))
 
             st.write("Registros más cercanos al centroide")
-            Cercanos,_ = pairwise_distances_argmin_min(MParticional.cluster_centers_, datosPCA[0:len(datosPCA.columns)-2])
+            Cercanos,_ = pairwise_distances_argmin_min(MParticional.cluster_centers_, session_state.numericos)
             Cercanos
 
         #st.write("1. Dimensiones de la data")
     except Exception as e:
         st.error("Datos no cargados o incompatibles, por favor dirígete a la pestaña de carga de datos.")
-        st.exception(e)
+        #st.exception(e)
 
 #@st.cache(suppress_st_warning=True)
 #def clustering_cache_sns(sns_data, columna, columna_tmp):
