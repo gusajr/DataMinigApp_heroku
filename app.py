@@ -49,7 +49,7 @@ PAGES = (
 )
 
 global session_state
-session_state = SessionState.get(datosEDA = 0, datos = None, valor_reemplazo = 0, widgetKey = 0)
+session_state = SessionState.get(datosEDA = 0, datos = None, valor_reemplazo = 0, widgetKey = "new.1")
 session_state_1 = SessionState.get(datosPCA = 0, clustering_sns_pairplot = None)
 session_state_1.clustering_sns_pairplot = None
 def pagina_inicio():
@@ -72,8 +72,6 @@ def pagina_inicio():
 
 def pagina_carga_datos():
 
-    session_state.widgetKey=0
-
     st.title('Carga y modificación de datos')
     st.header("Importación de datos")
     st.write("1. Lectura de datos")
@@ -84,7 +82,7 @@ def pagina_carga_datos():
         datos_header = 0
 
     datos_sep = st.text_input("Separación de los datos: ", value=",")
-    datos_subido = st.file_uploader("Escoge el archivo que quieres analizar: ", type = ['csv', 'xlsx', 'xls'],key=bytes(session_state.widgetKey))
+    datos_subido = st.file_uploader("Escoge el archivo que quieres analizar: ", type = ['csv', 'xlsx', 'xls'],key=session_state.widgetKey)
 
     if(datos_subido is not None):
         with st.spinner('Procesando datos...'):
@@ -93,7 +91,7 @@ def pagina_carga_datos():
             #st.write(session_state.datos_iniciales)
             session_state.datos_iniciales_0 = session_state.datos_iniciales
         st.success('¡Hecho!')
-        session_state.widgetKey = session_state.widgetKey + 1
+        session_state.widgetKey=session_state.widgetKey.split(".")[0]+str(int(session_state.widgetKey.split(".")[1])+1)
         session_state.datos = session_state.datos_iniciales
     
     if(session_state.datos is None):
