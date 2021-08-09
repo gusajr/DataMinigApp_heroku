@@ -92,8 +92,8 @@ def pagina_carga_datos():
             session_state.datos_iniciales = pd.DataFrame(datos_csv)
             #st.write(session_state.datos_iniciales)
             session_state.datos_iniciales_0 = session_state.datos_iniciales
-            session_state.widgetKey = session_state.widgetKey + 1
         st.success('¡Hecho!')
+        session_state.widgetKey = session_state.widgetKey + 1
         session_state.datos = session_state.datos_iniciales
     
     if(session_state.datos is None):
