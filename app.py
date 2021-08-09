@@ -94,7 +94,7 @@ def pagina_carga_datos():
             #st.write(session_state.datos_iniciales)
             session_state.datos_iniciales_0 = session_state.datos_iniciales
         st.success('¡Hecho!')
-        session_state.widgetKey=session_state.widgetKey.split(".")[0]+str(int(session_state.widgetKey.split(".")[1])+1)
+        session_state.widgetKey=session_state.widgetKey.split(".")[0]+"."+str(int(session_state.widgetKey.split(".")[1])+1)
         session_state.datos = session_state.datos_iniciales
     
     if(session_state.datos is None):
